@@ -1,0 +1,9 @@
+[workspace]
+members = ["iec104"]
+resolver = "2"
+
+[workspace.dependencies]
+tokio = { version = "1.41.1", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.9"
+config = { version = "0.13", features = ["yaml"] }

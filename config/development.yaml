@@ -1,0 +1,13 @@
+server:
+  host: "127.0.0.1"
+  port: 8080
+  max_connections: 100    # 开发环境使用较小的连接数
+  buffer_size: 4096      # 4KB
+  timeouts:
+    connection: 300      # 开发环境使用更长的超时时间
+    retry_delay: 1000    # 更长的重试延迟，方便调试
+  
+logging:
+  level: "debug"         # 开发环境使用更详细的日志
+  file: "logs/server-dev.log"
+  rotation: "daily"

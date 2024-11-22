@@ -1,0 +1,22 @@
+[package]
+name = "iec104"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "iec104"
+path = "src/lib.rs"
+
+[[bin]]
+name = "iec104-server"
+path = "src/server.rs"
+
+[[bin]]
+name = "iec104-client"
+path = "src/client.rs"
+
+[dependencies]
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_yaml = { workspace = true }
+config = { workspace = true }

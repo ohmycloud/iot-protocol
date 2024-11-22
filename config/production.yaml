@@ -1,0 +1,13 @@
+server:
+  host: "0.0.0.0"        # 生产环境监听所有接口
+  port: 2404             # IEC104 标准端口
+  max_connections: 5000  # 生产环境支持更多连接
+  buffer_size: 8192      # 8KB
+  timeouts:
+    connection: 60      # 标准超时时间
+    retry_delay: 100    # 快速重试
+
+logging:
+  level: "info"         # 生产环境使用信息级别日志
+  file: "/var/log/iec104/server.log"  # 标准日志路径
+  rotation: "daily"

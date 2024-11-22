@@ -1,0 +1,13 @@
+server:
+  host: "127.0.0.1"
+  port: 8080
+  max_connections: 1000
+  buffer_size: 8192  # 8KB
+  timeouts:
+    connection: 60    # 连接超时时间（秒）
+    retry_delay: 100  # 错误重试延迟（毫秒）
+  
+logging:
+  level: "info"
+  file: "logs/server.log"
+  rotation: "daily"
