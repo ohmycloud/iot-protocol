@@ -3,6 +3,7 @@ use tokio::{
     net::TcpStream,
     time::{sleep, Duration},
 };
+use bytes::{BytesMut, BufMut, Bytes};
 
 // IEC104 APCI 类型
 const START_BYTE: u8 = 0x68;
@@ -16,43 +17,40 @@ enum ApciType {
 }
 
 // 创建 U-Frame 启动帧
-fn create_startdt_act() -> Vec<u8> {
-    let mut frame = Vec::new();
-    frame.push(START_BYTE);   // 启动字符
-    frame.push(4);      // APDU 长度
-    frame.push(0x07);   // U-Frame 控制域 1 (STARTDT act)
-    frame.push(0x00);   // U-Frame 控制域 2
-    frame.push(0x00);   // U-Frame 控制域 3
-    frame.push(0x00);   // U-Frame 控制域 4
-    frame
+fn create_startdt_act() -> Bytes {
+    let mut buf = BytesMut::with_capacity(6);
+    buf.put_u8(START_BYTE);  // 启动字符
+    buf.put_u8(4);        // APDU 长度
+    buf.put_u8(0x07);     // U-Frame 控制域 1 (STARTDT act)
+    buf.put_u8(0x00);     // U-Frame 控制域 2
+    buf.put_u8(0x00);     // U-Frame 控制域 3
+    buf.put_u8(0x00);     // U-Frame 控制域 4
+    buf.freeze()
 }
 
 // 创建测试 I-Frame
-fn create_test_i_frame() -> Vec<u8> {
-    let mut frame = Vec::new();
-    frame.push(START_BYTE);   // 启动字符
-    frame.push(14);     // APDU 长度
-    
-    // 控制域 (I-Format)
-    frame.push(0x00);   // 发送序号低字节
-    frame.push(0x00);   // 发送序号高字节
-    frame.push(0x00);   // 接收序号低字节
-    frame.push(0x00);   // 接收序号高字节
+fn create_test_i_frame() -> Bytes {
+    let mut buf = BytesMut::with_capacity(16);
+    // APCI
+    buf.put_u8(0x68);  // Start
+    buf.put_u8(0x0E);  // Length of APDU (14 bytes)
+    buf.put_u8(0x00);  // Control field 1 - I-Frame
+    buf.put_u8(0x00);  // Control field 2
+    buf.put_u8(0x00);  // Control field 3
+    buf.put_u8(0x00);  // Control field 4
 
     // ASDU
-    frame.push(0x2D);   // 类型标识符 (45: 单命令)
-    frame.push(0x01);   // 可变结构限定词
-    frame.push(0x06);   // 传送原因
-    frame.push(0x00);   // 传送原因高字节
-    frame.push(0x01);   // 公共地址低字节
-    frame.push(0x00);   // 公共地址高字节
-    
-    // 信息对象
-    frame.push(0x01);   // 信息对象地址低字节
-    frame.push(0x00);   // 信息对象地址高字节
-    frame.push(0x01);   // 单命令值
+    buf.put_u8(0x64);  // TypeID: C_SE_NC_1 (100) - 设定命令，规一化值
+    buf.put_u8(0x01);  // VSQ: 单个信息对象
+    buf.put_u8(0x06);  // COT: 激活
+    buf.put_u8(0x00);  // Common Address of ASDU (低字节)
+    buf.put_u8(0x00);  // Common Address of ASDU (高字节)
+    buf.put_u8(0x01);  // Information Object Address (低字节)
+    buf.put_u8(0x00);  // Information Object Address (中字节)
+    buf.put_u8(0x00);  // Information Object Address (高字节)
+    buf.put_f32(3.14); // 规一化值
 
-    frame
+    buf.freeze()
 }
 
 #[tokio::main]
@@ -65,8 +63,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let startdt = create_startdt_act();
     stream.write_all(&startdt).await?;
     println!("Sent STARTDT activation");
-    
-    // 等待一下
+
     sleep(Duration::from_secs(1)).await;
 
     // 发送测试数据帧

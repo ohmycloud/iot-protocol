@@ -32,7 +32,7 @@ pub struct Settings {
 
 impl Settings {
     pub fn new() -> Result<Self, ConfigError> {
-        let run_mode = std::env::var("RUN_MODE").unwrap_or_else(|_| "development".into());
+        let run_mode = std::env::var("APP_ENV").unwrap_or_else(|_| "development".into());
         
         // 获取配置文件的目录路径
         let config_dir = std::env::current_dir()

@@ -20,3 +20,4 @@ tokio = { workspace = true }
 serde = { workspace = true }
 serde_yaml = { workspace = true }
 config = { workspace = true }
+bytes = { workspace = true }
